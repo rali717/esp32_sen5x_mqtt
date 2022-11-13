@@ -21,6 +21,7 @@ const char *PARAM_MQTT_PASSWORD = "flash_MqttPassword";
 const char *PARAM_MQTT_TOPIC = "flash_MqttTopic";
 const char *PARAM_POLL_INTERVAL = "flash_PollInterval";
 const char *PARAM_TAGNAME = "flash_TagName";
+const char *PARAM_TEMP_OFFSET = "flash_TempOffset";
 
 const char *PARAM_REBOOT = "REBOOT_DEVICE";
 
@@ -87,17 +88,8 @@ const char index_html[] PROGMEM = R"rawliteral(
 
 <h3>
   <form action="/get" target="hidden-form">
-    <b><u>MQTT-Topic (eq. sensors/DS18B20):</u> &nbsp;&nbsp;&nbsp; <br>%flash_MqttTopic%  </b> <br>
+    <b><u>MQTT-Topic (eq. sensors/sen5x/esp32-123456):</u> &nbsp;&nbsp;&nbsp; <br>%flash_MqttTopic%  </b> <br>
     <input type="text" name="flash_MqttTopic">
-    <input type="submit" value="Update" onclick="submitMessage()">
-  </form><br>
-</h3>
-<hr>
-
-<h3>
-  <form action="/get" target="hidden-form">
-    <b><u>Poll-Interval [sec]  (>=5):</u> &nbsp;&nbsp;&nbsp; <br>%flash_PollInterval%  </b> <br>
-    <input type="text" name="flash_PollInterval">
     <input type="submit" value="Update" onclick="submitMessage()">
   </form><br>
 </h3>
@@ -110,6 +102,28 @@ const char index_html[] PROGMEM = R"rawliteral(
     <input type="submit" value="Update" onclick="submitMessage()">
   </form><br>
 </h3>
+
+<hr> 
+
+<h3>
+  <form action="/get" target="hidden-form">
+    <b><u>Poll-Interval [sec]  (>=5):</u> &nbsp;&nbsp;&nbsp; <br>%flash_PollInterval%  </b> <br>
+    <input type="text" name="flash_PollInterval">
+    <input type="submit" value="Update" onclick="submitMessage()">
+  </form><br>
+</h3>
+
+<h3>
+  <form action="/get" target="hidden-form">
+    <b><u>Temp-Offset (e.g. 1.2):</u> &nbsp;&nbsp;&nbsp; <br>%flash_TempOffset%  </b> <br>
+    <input type="text" name="flash_TempOffset">
+    <input type="submit" value="Update" onclick="submitMessage()">
+  </form><br>
+</h3>
+<hr>
+
+
+
 
 <hr>
 <hr>
@@ -168,6 +182,10 @@ String processor(const String &var)
   else if (var == "flash_TagName")
   {
     return readFile(SPIFFS, "/flash_TagName.txt");
+  }
+  else if (var == "flash_TempOffset")
+  {
+    return readFile(SPIFFS, "/flash_TempOffset.txt");
   }
 
   return String();
@@ -267,6 +285,10 @@ void start_webserver()
     else if (request->hasParam(PARAM_TAGNAME)) {
       inputMessage = request->getParam(PARAM_TAGNAME)->value();
       writeFile(SPIFFS, "/flash_TagName.txt", inputMessage.c_str());
+    }
+    else if (request->hasParam(PARAM_TEMP_OFFSET)) {
+      inputMessage = request->getParam(PARAM_TEMP_OFFSET)->value();
+      writeFile(SPIFFS, "/flash_TempOffset.txt", inputMessage.c_str());
     }
 
     else if (request->hasParam(PARAM_REBOOT)) {
