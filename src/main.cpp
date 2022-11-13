@@ -127,7 +127,6 @@ void setup(void)
   flash_PollInterval = readFile(SPIFFS, "/flash_PollInterval.txt");
   flash_TagName = readFile(SPIFFS, "/flash_TagName.txt");
   flash_TempOffset = readFile(SPIFFS, "/flash_TempOffset.txt");
-  
 
   Serial.print("\nTagName:");
   Serial.print(flash_TagName);
@@ -259,6 +258,7 @@ void loop(void) // Main-Loop
     if (mqtt_pub_result)
     {
       Serial.print("\n\nSend result (MQTT):  success !\n");
+      // sen5x.print_sen5x_info();
     }
     else
     {
@@ -298,8 +298,9 @@ void connect_wifi()
 //-----------------------------------------------------------------------------
 // ---  Handle incomming MQTT-Messages ----------------------------------------
 //-----------------------------------------------------------------------------
-// {"set_new_topic":"The Topic2","set_new_tempOffset":1.2,"set_new_tagName":"The new TagName"}
-
+/*
+      {"set_new_topic":"The Topic2","set_new_tempOffset":1.2,"set_new_tagName":"The new TagName"}
+*/
 void mqtt_callback(char *topic, byte *message, unsigned int length)
 {
   Serial.print("Message arrived on topic: \n");
@@ -336,7 +337,7 @@ void mqtt_callback(char *topic, byte *message, unsigned int length)
     Serial.print(flash_TagName);
   };
 
-//=
+  //=
 
   if (jsonDocument.containsKey("set_new_topic"))
   {
@@ -347,39 +348,33 @@ void mqtt_callback(char *topic, byte *message, unsigned int length)
     Serial.print(flash_MqttTopic);
   };
 
-//=
+  //=
 
   if (jsonDocument.containsKey("set_new_tempOffset"))
   {
     Serial.print("\nReceived new TempOffset \n");
 
-    const char* new_tempOffset =  jsonDocument["set_new_tempOffset"];
+    float newTemp;
 
-
-
-    //writeFile(SPIFFS, "/flash_TagName.txt", new_tempOffset.c_str());
-    delay(3000);
-    flash_TempOffset = new_tempOffset;
-    Serial.print("\nWrite new TempOffset \n");
-    delay(3000);
-    // writeFile(SPIFFS, "/flash_TagName.txt", flash_TempOffset.c_str());
-
-    // writeFile(SPIFFS, "/flash_TagName.txt", String(new_tempOffset));
-
-    Serial.print("\nNew TempOffset was set: ");
-    delay(3000);
-    //Serial.print(flash_TempOffset);
     try
     {
-    //  tempOffset = flash_TempOffset.toFloat();
+      newTemp = jsonDocument["set_new_tempOffset"];
     }
     catch (...)
     {
-      Serial.print("\nError get TempOffset\n\nSet to 0.0°C");
-      tempOffset = 0.0f;
+      Serial.print("\nError setting new TempOffset!!!\n\n");
+      return;
     }
+    
+    tempOffset = newTemp;
+    sen5x.set_temp_offset(tempOffset);
 
-   
+    flash_TempOffset = String(tempOffset);
+    writeFile(SPIFFS, "/flash_TempOffset.txt", flash_TempOffset.c_str());
+
+    Serial.print("\n\nSet new tempOffset to:  ");
+    Serial.print(tempOffset);
+    Serial.print("\n");
   }
 } //--- End of mqtt_callback ---
 
@@ -406,16 +401,22 @@ void mqtt_reconnect()
       Serial.print("\nMQTT-Subscripe to:  ");
       Serial.print(subscribe_Topic);
       Serial.print("\n");
-      bool result=mqtt_client.subscribe(subscribe_Topic.c_str());
-      if (result==false){mqtt_reconnect();}
+      bool result = mqtt_client.subscribe(subscribe_Topic.c_str());
+      if (result == false)
+      {
+        mqtt_reconnect();
+      }
 
       String hostname = WiFi.getHostname();
       subscribe_Topic = "sensors/" + hostname;
       Serial.print("\nMQTT-Subscripe to:  ");
       Serial.print(subscribe_Topic);
       Serial.print("\n");
-      result=mqtt_client.subscribe(subscribe_Topic.c_str());
-      if (result==false){mqtt_reconnect();}
+      result = mqtt_client.subscribe(subscribe_Topic.c_str());
+      if (result == false)
+      {
+        mqtt_reconnect();
+      }
     }
     else
     {

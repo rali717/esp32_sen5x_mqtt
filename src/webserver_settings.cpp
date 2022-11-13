@@ -46,6 +46,7 @@ const char index_html[] PROGMEM = R"rawliteral(
   <b></b> <b></b> <b></b>
 <hr>
 <hr>
+<hr>
   <form action="/get" target="hidden-form">
     <h3><b><u>Network-Name (SSID):</u> &nbsp;&nbsp;&nbsp;  <br>%flash_SSID%  </b> <br>
     <input type="text" name="flash_SSID">
@@ -60,6 +61,8 @@ const char index_html[] PROGMEM = R"rawliteral(
   </form><br>
 </h3>
 
+<hr>
+<hr>
 <hr>
 
 <h3>
@@ -93,6 +96,9 @@ const char index_html[] PROGMEM = R"rawliteral(
     <input type="submit" value="Update" onclick="submitMessage()">
   </form><br>
 </h3>
+
+<hr>
+<hr>
 <hr>
 
 <h3>
@@ -103,7 +109,9 @@ const char index_html[] PROGMEM = R"rawliteral(
   </form><br>
 </h3>
 
-<hr> 
+<hr>
+<hr>
+<hr>
 
 <h3>
   <form action="/get" target="hidden-form">
@@ -120,13 +128,11 @@ const char index_html[] PROGMEM = R"rawliteral(
     <input type="submit" value="Update" onclick="submitMessage()">
   </form><br>
 </h3>
-<hr>
-
-
-
 
 <hr>
 <hr>
+<hr>
+
 <h2> <b> For activating the new settings, please repower the unit or press the "Reboot Device" button! </b> </h2>
 
 <h3>

@@ -34,7 +34,7 @@ public:
     void debug_msg(bool value);
     bool init(TwoWire& i2cBus);
 
-    void set_temp_offset (float value);
+    bool set_temp_offset (float value);
     String getSerialNumber();
     bool read_sen5x_info();
     void print_sen5x_info();

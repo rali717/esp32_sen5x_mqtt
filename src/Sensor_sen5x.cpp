@@ -103,9 +103,9 @@ String Sensor_sen5x::get_sen5x_Data_String()
         sen5x_json.concat("\",");
 
 //---
-        sen5x_json.concat("\"temp_offset\":\"");
+        sen5x_json.concat("\"temp_offset\":");
         sen5x_json.concat(tempOffset);
-        sen5x_json.concat("\",");
+        sen5x_json.concat(",");
 
         if (!isnan(ambientTemperature))
         {
@@ -213,8 +213,26 @@ String Sensor_sen5x::getSerialNumber()
 }
 
 // ----------------------------------------------------------------------------
-void Sensor_sen5x::set_temp_offset (float value){
+bool Sensor_sen5x::set_temp_offset (float value){
+    
     this->tempOffset = value;
+    
+    uint16_t error = sen5x.setTemperatureOffsetSimple(tempOffset);
+    
+    if (error)
+    {
+        Serial.print("\nError trying to execute setTemperatureOffsetSimple(): ");
+        errorToString(error, errorMessage, 256);
+        Serial.println(errorMessage);
+        return false;
+    }
+    else
+    {
+        Serial.print("\nTemperature Offset set to ");
+        Serial.print(tempOffset);
+        Serial.println(" deg. Celsius (SEN54/SEN55 only");
+        return true;
+    }
 }
 // ----------------------------------------------------------------------------
 
